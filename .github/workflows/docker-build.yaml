@@ -1,0 +1,41 @@
+name: Docker Build
+
+on:
+  push:
+    paths:
+      - "starter/frontend/**"
+      - "starter/backend/**"
+      - ".github/workflows/docker-build.yaml"
+  pull_request:
+    paths:
+      - "starter/frontend/**"
+      - "starter/backend/**"
+      - ".github/workflows/docker-build.yaml"
+
+jobs:
+  build-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build frontend image
+        run: |
+          docker build \
+            --build-arg REACT_APP_MOVIE_API_URL=http://localhost:5000 \
+            -t movie-frontend:ci \
+            ./starter/frontend
+
+  build-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build backend image
+        run: |
+          docker build \
+            -t movie-backend:ci \
+            ./starter/backend
