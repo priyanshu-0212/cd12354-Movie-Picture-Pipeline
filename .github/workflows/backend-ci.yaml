@@ -1,0 +1,57 @@
+name: Backend CI
+
+on:
+  push:
+    paths:
+      - "starter/backend/**"
+      - ".github/workflows/backend-ci.yaml"
+  pull_request:
+    paths:
+      - "starter/backend/**"
+      - ".github/workflows/backend-ci.yaml"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: starter/backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install pipenv && pipenv install --dev
+
+      - name: Run lint
+        run: pipenv run lint
+
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: starter/backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install pipenv && pipenv install --dev
+
+      - name: Run tests
+        run: pipenv run test
