@@ -1,14 +1,14 @@
 name: Backend CI
 
 on:
-  push:
-    paths:
-      - "starter/backend/**"
-      - ".github/workflows/backend-ci.yaml"
   pull_request:
+    branches:
+      - main
     paths:
       - "starter/backend/**"
       - ".github/workflows/backend-ci.yaml"
+
+  workflow_dispatch:
 
 jobs:
   lint:
@@ -34,7 +34,6 @@ jobs:
         run: pipenv run lint
 
   test:
-    needs: lint
     runs-on: ubuntu-latest
 
     defaults:
@@ -55,3 +54,18 @@ jobs:
 
       - name: Run tests
         run: pipenv run test
+
+  build:
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: starter/backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t mp-backend:latest .
