@@ -12,6 +12,11 @@ on:
       - "starter/backend/**"
       - ".github/workflows/docker-build.yaml"
 
+env:
+  AWS_REGION: us-east-1
+  FRONTEND_REPOSITORY: frontend
+  BACKEND_REPOSITORY: backend
+
 jobs:
   build-frontend:
     runs-on: ubuntu-latest
@@ -20,12 +25,33 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Configure AWS credentials
+        if: github.event_name == 'push'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        if: github.event_name == 'push'
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
       - name: Build frontend image
         run: |
           docker build \
             --build-arg REACT_APP_MOVIE_API_URL=http://localhost:5000 \
             -t movie-frontend:ci \
             ./starter/frontend
+
+      - name: Push frontend image to ECR
+        if: github.event_name == 'push'
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker tag movie-frontend:ci $ECR_REGISTRY/$FRONTEND_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$FRONTEND_REPOSITORY:latest
 
   build-backend:
     runs-on: ubuntu-latest
@@ -34,8 +60,29 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Configure AWS credentials
+        if: github.event_name == 'push'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        if: github.event_name == 'push'
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
       - name: Build backend image
         run: |
           docker build \
             -t movie-backend:ci \
             ./starter/backend
+
+      - name: Push backend image to ECR
+        if: github.event_name == 'push'
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker tag movie-backend:ci $ECR_REGISTRY/$BACKEND_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$BACKEND_REPOSITORY:latest
