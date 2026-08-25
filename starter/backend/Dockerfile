@@ -19,4 +19,4 @@ COPY . .
 
 EXPOSE 5000
 
-CMD ["uwsgi", "--http", ":5000", "--master", "--enable-threads", "--module", "app:app"]
+CMD ["uwsgi", "--http", ":5000", "--master", "--enable-threads", "--module", "__init__:app"]
