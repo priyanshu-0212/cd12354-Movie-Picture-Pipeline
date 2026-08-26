@@ -195,6 +195,8 @@ resource "aws_eks_node_group" "main" {
   node_group_name = "udacity"
   cluster_name    = aws_eks_cluster.main.name
   version         = aws_eks_cluster.main.version
+  ami_type        = "AL2_x86_64"
+  release_version = data.aws_ssm_parameter.eks_ami_release_version.value
   node_role_arn   = aws_iam_role.node_group.arn
 
   subnet_ids = [

@@ -64,7 +64,7 @@ jobs:
     needs: [lint, test]
 
     env:
-      REACT_APP_MOVIE_API_URL: http://localhost:5000
+      REACT_APP_MOVIE_API_URL: http://a9bd20bead3fa44e3a579b3acb439577-1009099338.us-east-1.elb.amazonaws.com
 
     steps:
       - name: Checkout code
