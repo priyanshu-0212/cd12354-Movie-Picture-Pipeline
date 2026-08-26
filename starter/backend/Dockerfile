@@ -15,8 +15,8 @@ COPY Pipfile* ./
 
 RUN pipenv install --system --deploy
 
-COPY . .
+COPY . ./backend
 
 EXPOSE 5000
 
-CMD ["uwsgi", "--http", ":5000", "--master", "--enable-threads", "--module", "backend:app"]
+CMD ["uwsgi", "--http", ":5000", "--master", "--enable-threads", "--module", "backend.__init__:app"]
