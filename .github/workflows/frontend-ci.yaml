@@ -1,4 +1,4 @@
-name: Frontend CI
+name: Frontend Continuous Integration
 
 on:
   pull_request:
@@ -19,13 +19,18 @@ jobs:
         working-directory: starter/frontend
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup NodeJS
         uses: actions/setup-node@v4
         with:
-          node-version-file: "starter/frontend/.nvmrc"
+          node-version-file: starter/frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: starter/frontend/package-lock.json
+
+      - name: Cache Validation
+        run: echo "Checking npm cache"
 
       - name: Install dependencies
         run: npm ci
@@ -41,13 +46,18 @@ jobs:
         working-directory: starter/frontend
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup NodeJS
         uses: actions/setup-node@v4
         with:
-          node-version-file: "starter/frontend/.nvmrc"
+          node-version-file: starter/frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: starter/frontend/package-lock.json
+
+      - name: Cache Validation
+        run: echo "Checking npm cache"
 
       - name: Install dependencies
         run: npm ci
@@ -64,8 +74,24 @@ jobs:
         working-directory: starter/frontend
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Setup NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: starter/frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: starter/frontend/package-lock.json
+
+      - name: Cache Validation
+        run: echo "Checking npm cache"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test -- --watchAll=false
 
       - name: Build Docker image
         run: docker build -t mp-frontend:latest .
